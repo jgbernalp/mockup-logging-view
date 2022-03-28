@@ -3,8 +3,8 @@ import { Route, RouteComponentProps, Switch } from 'react-router-dom';
 import { accessibleRouteChangeHandler } from '@app/utils/utils';
 import { Dashboard } from '@app/Dashboard/Dashboard';
 import { Support } from '@app/Support/Support';
-import { GeneralSettings } from '@app/Settings/General/GeneralSettings';
-import { ProfileSettings } from '@app/Settings/Profile/ProfileSettings';
+import { MetricsPage } from '@app/Observe/Metrics/MetricsPage';
+import { LogsPage } from '@app/Observe/Logs/LogsPage';
 import { NotFound } from '@app/NotFound/NotFound';
 import { useDocumentTitle } from '@app/utils/useDocumentTitle';
 import { LastLocationProvider, useLastLocation } from 'react-router-last-location';
@@ -38,29 +38,21 @@ const routes: AppRouteConfig[] = [
     title: 'PatternFly Seed | Main Dashboard',
   },
   {
-    component: Support,
-    exact: true,
-    isAsync: true,
-    label: 'Support',
-    path: '/support',
-    title: 'PatternFly Seed | Support Page',
-  },
-  {
-    label: 'Settings',
+    label: 'Observe',
     routes: [
       {
-        component: GeneralSettings,
+        component: MetricsPage,
         exact: true,
-        label: 'General',
-        path: '/settings/general',
-        title: 'PatternFly Seed | General Settings',
+        label: 'Metrics',
+        path: '/monitoring/query-browser',
+        title: 'Metrics',
       },
       {
-        component: ProfileSettings,
+        component: LogsPage,
         exact: true,
-        label: 'Profile',
-        path: '/settings/profile',
-        title: 'PatternFly Seed | Profile Settings',
+        label: 'Logs',
+        path: '/monitoring/logs',
+        title: 'Logs',
       },
     ],
   },
@@ -89,7 +81,7 @@ const RouteWithTitleUpdates = ({ component: Component, isAsync = false, title, .
     return <Component {...rest} {...routeProps} />;
   }
 
-  return <Route render={routeWithTitle} {...rest}/>;
+  return <Route render={routeWithTitle} {...rest} />;
 };
 
 const PageNotFound = ({ title }: { title: string }) => {
