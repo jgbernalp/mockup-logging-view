@@ -4,7 +4,7 @@ import { accessibleRouteChangeHandler } from '@app/utils/utils';
 import { Dashboard } from '@app/Dashboard/Dashboard';
 import { Support } from '@app/Support/Support';
 import { MetricsPage } from '@app/Observe/Metrics/MetricsPage';
-import { LogsPage } from '@app/Observe/Logs/LogsPage';
+import { LogsPage } from '@app/Observe/Logs/logs-page';
 import { NotFound } from '@app/NotFound/NotFound';
 import { useDocumentTitle } from '@app/utils/useDocumentTitle';
 import { LastLocationProvider, useLastLocation } from 'react-router-last-location';

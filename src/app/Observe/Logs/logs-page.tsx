@@ -1,5 +1,5 @@
-import { LogsHistogram } from '@app/components/LogsHistogram';
-import { LogsTable } from '@app/components/LogsTable';
+import { LogsHistogram } from '@app/components/logs-histogram';
+import { LogsTable } from '@app/components/logs-table';
 import { logsVolumeData, logsStreamData } from '@app/data/logs-test-data';
 import { useBoolean } from '@app/utils/useBoolean';
 import { Dropdown, DropdownItem, DropdownToggle, Flex, PageSection, Title } from '@patternfly/react-core';

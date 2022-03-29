@@ -1,34 +1,25 @@
 import { Chart, ChartAxis, ChartBar, ChartStack, ChartTooltip, getResizeObserver } from '@patternfly/react-charts';
+import chart_color_blue_100 from '@patternfly/react-tokens/dist/esm/chart_color_blue_100';
+import chart_color_gold_100 from '@patternfly/react-tokens/dist/esm/chart_color_gold_100';
+import chart_color_red_100 from '@patternfly/react-tokens/dist/esm/chart_color_red_100';
 import * as _ from 'lodash-es';
 import React from 'react';
-
-import chart_color_blue_100 from '@patternfly/react-tokens/dist/esm/chart_color_blue_100';
-import chart_color_red_100 from '@patternfly/react-tokens/dist/esm/chart_color_red_100';
-import chart_color_gold_100 from '@patternfly/react-tokens/dist/esm/chart_color_gold_100';
-import { MetricLogData } from './Logs.types';
+import { DateFormat, dateToFormat } from './date-utils';
+import { MetricLogData } from './logs.types';
 
 interface LogHistogramProps {
   logsData: Array<MetricLogData>;
   ariaDesc?: string;
 }
 
-const aggregateLogData = (data: Array<MetricLogData>): MetricLogData => {
-  if (data.length === 1) {
-    return data[0];
-  }
-
+const aggregateMetricsLogData = (data: Array<MetricLogData>): MetricLogData => {
   // TODO merge based on timestamp
-  const aggregatedValues = _.flatMap(data.map((metric) => metric.values));
+  const aggregatedValues = data.length === 1 ? data[0].values : _.flatMap(data.map((metric) => metric.values));
 
   return {
     metric: {},
     values: aggregatedValues,
   };
-};
-
-const dateFormat = (date: Date): string => {
-  const minutes = date.getMinutes();
-  return `${date.getHours()}:${minutes < 10 ? `0${minutes}` : minutes}`;
 };
 
 const GRAPH_HEIGHT = 150;
@@ -38,8 +29,9 @@ const END_DOMAIN_PADDING = 8;
 
 export const LogsHistogram: React.FC<LogHistogramProps> = ({ logsData, ariaDesc = 'Logs Histogram' }) => {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
+  // TODO: Debounce this value
   const [width, setWidth] = React.useState(0);
-  const aggregatedLogData = React.useMemo(() => aggregateLogData(logsData), [logsData]);
+  const aggregatedLogData = React.useMemo(() => aggregateMetricsLogData(logsData), [logsData]);
 
   const handleResize = () => {
     if (containerRef.current?.clientWidth) {
@@ -59,7 +51,7 @@ export const LogsHistogram: React.FC<LogHistogramProps> = ({ logsData, ariaDesc 
 
     const infoData = aggregatedLogData.values.map((value) => {
       const time = parseFloat(String(value[0]));
-      const formattedTime = dateFormat(new Date(time * 1000));
+      const formattedTime = dateToFormat(new Date(time * 1000), DateFormat.TimeShort);
       ticks.push(formattedTime);
 
       return {
@@ -72,7 +64,7 @@ export const LogsHistogram: React.FC<LogHistogramProps> = ({ logsData, ariaDesc 
 
     const warningData = aggregatedLogData.values.map((value) => {
       const time = parseFloat(String(value[0]));
-      const formattedTime = dateFormat(new Date(time * 1000));
+      const formattedTime = dateToFormat(new Date(time * 1000), DateFormat.TimeShort);
       ticks.push(formattedTime);
 
       return {
@@ -85,7 +77,7 @@ export const LogsHistogram: React.FC<LogHistogramProps> = ({ logsData, ariaDesc 
 
     const errorData = aggregatedLogData.values.map((value) => {
       const time = parseFloat(String(value[0]));
-      const formattedTime = dateFormat(new Date(time * 1000));
+      const formattedTime = dateToFormat(new Date(time * 1000), DateFormat.TimeShort);
       ticks.push(formattedTime);
 
       return {
@@ -124,8 +116,6 @@ export const LogsHistogram: React.FC<LogHistogramProps> = ({ logsData, ariaDesc 
       ),
     };
   }, [aggregatedLogData, width]);
-
-  console.log({ width });
 
   return (
     <div ref={containerRef} style={{ height: GRAPH_HEIGHT }}>

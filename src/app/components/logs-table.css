@@ -1,0 +1,44 @@
+.pf-c-table tbody > tr > .co-logs-table__time {
+  white-space: nowrap;
+  font-family: monospace;
+}
+
+.pf-c-table tbody > tr > .co-logs-table__message {
+  font-family: monospace;
+  word-break: break-all;
+}
+
+.pf-c-table tbody > tr {
+  position: relative;
+}
+
+.pf-c-table tbody > tr.co-logs-table__row::before {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  width: 3px;
+  left: 3px;
+  background-color: var(--pf-global--disabled-color--200);
+}
+
+.pf-c-table tbody > tr.co-logs-table__severity-error::before {
+  background-color: var(--pf-global--danger-color--100);
+}
+
+.pf-c-table tbody > tr.co-logs-table__severity-info::before {
+  background-color: var(--pf-global--info-color--100);
+}
+
+.pf-c-table tbody > tr.co-logs-table__severity-warning::before {
+  background-color: var(--pf-global--warning-color--100);
+}
+
+.pf-c-table.pf-m-compact tr:not(.pf-c-table__expandable-row) > *:first-child {
+  padding-left: 0;
+}
+
+.pf-c-table {
+  --pf-c-table__expandable-row--after--border-width--base: 0;
+}

@@ -9,7 +9,7 @@ export const logsStreamData = {
           ['1648210705642184300', 'Gracefully stopping... (press Ctrl+C again to force)'],
           [
             '1648210705642133800',
-            'containers-loki-1           | level=info ts=2022-03-25T11:48:22.596808Z caller=table.go:420 msg="cleaning up unwanted dbs from table index_19076"',
+            'no-spaces-message-containers-loki-1|level=infots=2022-03-25T11:48:08.2469652Zcaller=metrics.go:92org_id=fakelatency=fastquery="sumby(level)(count_over_time({filename=\\"/var/log/out.log\\"}[1m]))"query_type=metricrange_type=rangelength=29m0sstep=1m0sduration=10.1059msstatus=200limit=1744returned_lines=0throughput=0Btotal_bytes=0B',
           ],
           [
             '1648210705642086500',
@@ -45,7 +45,7 @@ export const logsStreamData = {
           ],
           [
             '1648210705641775400',
-            'containers-loki-1           | level=info ts=2022-03-25T11:48:08.2469652Z caller=metrics.go:92 org_id=fake latency=fast query="sum by(level)(count_over_time({filename=\\"/var/log/out.log\\"}[1m]))" query_type=metric range_type=range length=29m0s step=1m0s duration=10.1059ms status=200 limit=1744 returned_lines=0 throughput=0B total_bytes=0B',
+            'containers-loki-1|level=infots=2022-03-25T11:48:08.2469652Zcaller=metrics.go:92org_id=fakelatency=fastquery="sumby(level)(count_over_time({filename=\\"/var/log/out.log\\"}[1m]))"query_type=metricrange_type=rangelength=29m0sstep=1m0sduration=10.1059msstatus=200limit=1744returned_lines=0throughput=0Btotal_bytes=0B',
           ],
           [
             '1648210705641733900',
