@@ -83,10 +83,12 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData }) => {
 
       {tableData.map((value, index) => {
         const isExpanded = expandedItems.has(rowIndex);
+        const severityClass = getSeverityClass(value.severity);
+
         const parentRow = (
           <Tr
             key={`${value.timestamp}-${rowIndex}`}
-            className={`co-logs-table__row ${getSeverityClass(value.severity)}`}
+            className={`co-logs-table__row ${severityClass} ${isExpanded ? 'co-logs-table__row-parent-expanded' : ''}`}
           >
             <Td expand={{ isExpanded, onToggle: handleRowToggle, rowIndex }} />
             <Td className="co-logs-table__time">{value.time}</Td>
@@ -100,7 +102,11 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData }) => {
         );
 
         const childRow = isExpanded ? (
-          <Tr isExpanded={true} key={`${value.timestamp}-${rowIndex}-child`}>
+          <Tr
+            className={`co-logs-table__row ${severityClass} co-logs-table__row-child-expanded`}
+            isExpanded={true}
+            key={`${value.timestamp}-${rowIndex}-child`}
+          >
             <Td colSpan={5}>
               <ExpandableRowContent>
                 <LogDetail />

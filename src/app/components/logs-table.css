@@ -23,6 +23,14 @@
   background-color: var(--pf-global--disabled-color--200);
 }
 
+.pf-c-table tbody > tr.co-logs-table__row-child-expanded::before {
+  top: 0px;
+}
+
+.pf-c-table tbody > tr.co-logs-table__row-parent-expanded::before {
+  bottom: -1px;
+}
+
 .pf-c-table tbody > tr.co-logs-table__severity-error::before {
   background-color: var(--pf-global--danger-color--100);
 }
