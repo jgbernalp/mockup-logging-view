@@ -48,5 +48,5 @@
 }
 
 .pf-c-table tbody > tr > :first-child::after {
-  content: none;
+  --pf-c-table__expandable-row--after--BorderLeftWidth: none;
 }
