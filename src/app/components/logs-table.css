@@ -39,6 +39,6 @@
   padding-left: 0;
 }
 
-.pf-c-table {
-  --pf-c-table__expandable-row--after--border-width--base: 0;
+.pf-c-table tbody > tr > :first-child::after {
+  content: none;
 }
