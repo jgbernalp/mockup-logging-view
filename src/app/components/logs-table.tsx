@@ -1,11 +1,21 @@
+import {
+  Checkbox,
+  Split,
+  SplitItem,
+  Stack,
+  StackItem,
+  Toolbar,
+  ToolbarContent,
+  ToolbarItem,
+} from '@patternfly/react-core';
 import { ExpandableRowContent, TableComposable, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import * as _ from 'lodash-es';
 import React from 'react';
 import { DateFormat, dateToFormat } from './date-utils';
+import { LogDetail } from './log-detail';
+import './logs-table.css';
 import { StreamLogData } from './logs.types';
 import { ResourceLink } from './resource-link';
-import './logs-table.css';
-import { LogDetail } from './log-detail';
 
 interface LogsTableProps {
   logsData: Array<StreamLogData>;
@@ -29,6 +39,7 @@ const getSeverityClass = (severity: string) => {
 
 export const LogsTable: React.FC<LogsTableProps> = ({ logsData }) => {
   const [expandedItems, setExpandedItems] = React.useState<Set<number>>(new Set());
+  const [showResources, setShowResources] = React.useState(false);
   // TODO aggregate
   const aggregatedData = React.useMemo(() => aggregateStreamLogData(logsData), [logsData]);
   const tableData = aggregatedData.values.map((value, index) => {
@@ -70,60 +81,83 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData }) => {
   let rowIndex = 0;
 
   return (
-    <TableComposable aria-label="Expandable Table" variant="compact">
-      <Thead>
-        <Tr>
-          <Th></Th>
-          <Th></Th>
-          <Th>Date</Th>
-          <Th>Resources</Th>
-          <Th>Message</Th>
-        </Tr>
-      </Thead>
+    <>
+      <Toolbar isSticky>
+        <ToolbarContent>
+          <ToolbarItem variant="overflow-menu">
+            <Checkbox
+              label="Show Resources"
+              isChecked={showResources}
+              onChange={setShowResources}
+              aria-label="checkbox for showing resources names"
+              id="showResourcesCheckbox"
+            />
+          </ToolbarItem>
+        </ToolbarContent>
+      </Toolbar>
 
-      {tableData.map((value, index) => {
-        const isExpanded = expandedItems.has(rowIndex);
-        const severityClass = getSeverityClass(value.severity);
-
-        const parentRow = (
-          <Tr
-            key={`${value.timestamp}-${rowIndex}`}
-            className={`co-logs-table__row ${severityClass} ${isExpanded ? 'co-logs-table__row-parent-expanded' : ''}`}
-          >
-            <Td expand={{ isExpanded, onToggle: handleRowToggle, rowIndex }} />
-            <Td className="co-logs-table__time">{value.time}</Td>
-            <Td>
-              {value.resources.map((resource) => (
-                <ResourceLink link={resource.link} type={resource.type} name={resource.id} key={resource.id} />
-              ))}
-            </Td>
-            <Td className="co-logs-table__message">{value.message}</Td>
+      <TableComposable aria-label="Logs Table" variant="compact" className="co-logs-table">
+        <Thead>
+          <Tr>
+            <Th></Th>
+            <Th></Th>
+            <Th>Date</Th>
+            <Th>Message</Th>
           </Tr>
-        );
+        </Thead>
 
-        const childRow = isExpanded ? (
-          <Tr
-            className={`co-logs-table__row ${severityClass} co-logs-table__row-child-expanded`}
-            isExpanded={true}
-            key={`${value.timestamp}-${rowIndex}-child`}
-          >
-            <Td colSpan={5}>
-              <ExpandableRowContent>
-                <LogDetail />
-              </ExpandableRowContent>
-            </Td>
-          </Tr>
-        ) : null;
+        {tableData.map((value, index) => {
+          const isExpanded = expandedItems.has(rowIndex);
+          const severityClass = getSeverityClass(value.severity);
 
-        rowIndex += isExpanded ? 2 : 1;
+          const parentRow = (
+            <Tr
+              key={`${value.timestamp}-${rowIndex}`}
+              className={`co-logs-table__row ${severityClass} ${
+                isExpanded ? 'co-logs-table__row-parent-expanded' : ''
+              }`}
+            >
+              <Td expand={{ isExpanded, onToggle: handleRowToggle, rowIndex }} />
+              <Td className="co-logs-table__time">{value.time}</Td>
+              <Td>
+                <div className="co-logs-table__message">{value.message}</div>
+                {showResources && (
+                  <Split className="co-logs-table__resources" hasGutter>
+                    {value.resources.map((resource) => (
+                      <SplitItem key={resource.id}>
+                        <ResourceLink link={resource.link} type={resource.type} name={resource.id} />
+                      </SplitItem>
+                    ))}
+                  </Split>
+                )}
+              </Td>
+            </Tr>
+          );
 
-        return (
-          <Tbody isExpanded={isExpanded} key={index}>
-            {parentRow}
-            {childRow}
-          </Tbody>
-        );
-      })}
-    </TableComposable>
+          const childRow = isExpanded ? (
+            <Tr
+              className={`co-logs-table__row ${severityClass} co-logs-table__row-child-expanded`}
+              isExpanded={true}
+              key={`${value.timestamp}-${rowIndex}-child`}
+            >
+              <Td colSpan={100}>
+                <ExpandableRowContent>
+                  <LogDetail />
+                </ExpandableRowContent>
+              </Td>
+            </Tr>
+          ) : null;
+
+          rowIndex += isExpanded ? 2 : 1;
+
+          return (
+            <Tbody isExpanded={isExpanded} key={index}>
+              {parentRow}
+              {childRow}
+            </Tbody>
+          );
+        })}
+      </TableComposable>
+    </>
   );
 };
