@@ -6,6 +6,7 @@ import {
   StackItem,
   Toolbar,
   ToolbarContent,
+  ToolbarGroup,
   ToolbarItem,
 } from '@patternfly/react-core';
 import { ExpandableRowContent, TableComposable, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
@@ -37,7 +38,7 @@ const getSeverityClass = (severity: string) => {
   return severity ? `co-logs-table__severity-${severity}` : '';
 };
 
-export const LogsTable: React.FC<LogsTableProps> = ({ logsData }) => {
+export const LogsTable: React.FC<LogsTableProps> = ({ logsData, children }) => {
   const [expandedItems, setExpandedItems] = React.useState<Set<number>>(new Set());
   const [showResources, setShowResources] = React.useState(false);
   // TODO aggregate
@@ -84,15 +85,19 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData }) => {
     <>
       <Toolbar isSticky>
         <ToolbarContent>
-          <ToolbarItem variant="overflow-menu">
-            <Checkbox
-              label="Show Resources"
-              isChecked={showResources}
-              onChange={setShowResources}
-              aria-label="checkbox for showing resources names"
-              id="showResourcesCheckbox"
-            />
-          </ToolbarItem>
+          <ToolbarItem style={{ width: '100%' }}>{children}</ToolbarItem>
+
+          <ToolbarGroup>
+            <ToolbarItem>
+              <Checkbox
+                label="Show Resources"
+                isChecked={showResources}
+                onChange={setShowResources}
+                aria-label="checkbox for showing resources names"
+                id="showResourcesCheckbox"
+              />
+            </ToolbarItem>
+          </ToolbarGroup>
         </ToolbarContent>
       </Toolbar>
 

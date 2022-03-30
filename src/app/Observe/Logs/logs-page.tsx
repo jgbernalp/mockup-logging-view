@@ -1,3 +1,4 @@
+import { LogsExpressionInput } from '@app/components/logs-expression-input';
 import { LogsHistogram } from '@app/components/logs-histogram';
 import { LogsTable } from '@app/components/logs-table';
 import { logsVolumeData, logsStreamData } from '@app/data/logs-test-data';
@@ -52,7 +53,10 @@ const LogsPage: React.FunctionComponent = () => {
         </div>
       </Flex>
       <LogsHistogram logsData={logsVolumeData.data.result} />
-      <LogsTable logsData={logsStreamData.data.result} />
+
+      <LogsTable logsData={logsStreamData.data.result}>
+        <LogsExpressionInput />
+      </LogsTable>
     </PageSection>
   );
 };

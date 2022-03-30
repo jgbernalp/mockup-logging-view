@@ -1,0 +1,8 @@
+.co-logs-expression-input {
+  display: flex;
+  margin-bottom: var(--pf-global--spacer--md);
+}
+
+.co-logs-expression-input__textInput {
+  margin-right: var(--pf-global--spacer--sm);
+}
