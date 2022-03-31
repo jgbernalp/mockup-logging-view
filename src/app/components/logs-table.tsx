@@ -15,7 +15,7 @@ import { ExpandableRowContent, TableComposable, Tbody, Td, Th, Thead, Tr } from 
 import * as _ from 'lodash-es';
 import React from 'react';
 import { ResourceLink } from '../console-components/resource-link';
-import { DateFormat, dateToFormat } from './date-utils';
+import { DateFormat, dateToFormat } from '../console-components/date-utils';
 import { LogDetail } from './log-detail';
 import './logs-table.css';
 import { MetricValue, StreamLogData } from './logs.types';
@@ -33,7 +33,7 @@ type LogsTableColumn = {
 const parseValueData = (value: MetricValue, index: number) => {
   const timestamp = String(value[0]);
   const time = parseFloat(timestamp) / 1e6;
-  const formattedTime = dateToFormat(new Date(time), DateFormat.Full);
+  const formattedTime = dateToFormat(time, DateFormat.Full);
 
   return {
     time: formattedTime,
@@ -145,18 +145,8 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData, children }) => {
       <div>
         <Toolbar isSticky>
           <ToolbarContent>
-            <ToolbarItem className="co-logs-table-toolbar">{children}</ToolbarItem>
-
             <ToolbarGroup>
-              <ToolbarItem>
-                <Checkbox
-                  label="Show Resources"
-                  isChecked={showResources}
-                  onChange={setShowResources}
-                  aria-label="checkbox for showing resources names"
-                  id="showResourcesCheckbox"
-                />
-              </ToolbarItem>
+              <ToolbarItem>{children}</ToolbarItem>
             </ToolbarGroup>
             <ToolbarGroup variant="icon-button-group">
               <ToolbarItem>
@@ -165,6 +155,15 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData, children }) => {
                     <ColumnsIcon />
                   </Button>
                 </Tooltip>
+              </ToolbarItem>
+              <ToolbarItem>
+                <Checkbox
+                  label="Show Resources"
+                  isChecked={showResources}
+                  onChange={setShowResources}
+                  aria-label="checkbox for showing resources names"
+                  id="showResourcesCheckbox"
+                />
               </ToolbarItem>
             </ToolbarGroup>
           </ToolbarContent>

@@ -5,12 +5,13 @@ import chart_color_gold_100 from '@patternfly/react-tokens/dist/esm/chart_color_
 import chart_color_red_100 from '@patternfly/react-tokens/dist/esm/chart_color_red_100';
 import * as _ from 'lodash-es';
 import React from 'react';
-import { DateFormat, dateToFormat } from './date-utils';
+import { DateFormat, dateToFormat } from '../console-components/date-utils';
 import { MetricLogData } from './logs.types';
 
 interface LogHistogramProps {
   logsData: Array<MetricLogData>;
   ariaDesc?: string;
+  ariaTitle?: string;
 }
 
 const aggregateMetricsLogData = (data: Array<MetricLogData>): MetricLogData => {
@@ -28,7 +29,11 @@ const LEFT_PADDING = 50;
 const START_DOMAIN_PADDING = 8;
 const END_DOMAIN_PADDING = 8;
 
-export const LogsHistogram: React.FC<LogHistogramProps> = ({ logsData, ariaDesc = 'Logs Histogram' }) => {
+export const LogsHistogram: React.FC<LogHistogramProps> = ({
+  logsData,
+  ariaDesc = 'Logs Histogram',
+  ariaTitle = 'Logs Historgam',
+}) => {
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   // TODO: Debounce this value
   const [width, setWidth] = React.useState(0);
@@ -52,7 +57,7 @@ export const LogsHistogram: React.FC<LogHistogramProps> = ({ logsData, ariaDesc 
 
     const infoData = aggregatedLogData.values.map((value) => {
       const time = parseFloat(String(value[0]));
-      const formattedTime = dateToFormat(new Date(time * 1000), DateFormat.TimeShort);
+      const formattedTime = dateToFormat(time * 1000, DateFormat.TimeShort);
       ticks.push(formattedTime);
 
       return {
@@ -65,7 +70,7 @@ export const LogsHistogram: React.FC<LogHistogramProps> = ({ logsData, ariaDesc 
 
     const warningData = aggregatedLogData.values.map((value) => {
       const time = parseFloat(String(value[0]));
-      const formattedTime = dateToFormat(new Date(time * 1000), DateFormat.TimeShort);
+      const formattedTime = dateToFormat(time * 1000, DateFormat.TimeShort);
       ticks.push(formattedTime);
 
       return {
@@ -78,7 +83,7 @@ export const LogsHistogram: React.FC<LogHistogramProps> = ({ logsData, ariaDesc 
 
     const errorData = aggregatedLogData.values.map((value) => {
       const time = parseFloat(String(value[0]));
-      const formattedTime = dateToFormat(new Date(time * 1000), DateFormat.TimeShort);
+      const formattedTime = dateToFormat(time * 1000, DateFormat.TimeShort);
       ticks.push(formattedTime);
 
       return {
@@ -124,6 +129,7 @@ export const LogsHistogram: React.FC<LogHistogramProps> = ({ logsData, ariaDesc 
         <div ref={containerRef} style={{ height: GRAPH_HEIGHT }}>
           <Chart
             ariaDesc={ariaDesc}
+            ariaTitle={ariaTitle}
             height={GRAPH_HEIGHT}
             padding={{
               bottom: 40,

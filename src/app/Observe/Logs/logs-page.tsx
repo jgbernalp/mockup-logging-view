@@ -108,7 +108,7 @@ const LogsPage: React.FunctionComponent = () => {
           <Flex>
             <TimeRangeDropdown />
             <RefreshIntervalDropdown />
-            <Button variant="primary">
+            <Button aria-label="Refresh" variant="primary">
               <SyncAltIcon />
             </Button>
           </Flex>

@@ -1,8 +1,8 @@
 .co-logs-expression-input {
   display: flex;
-  margin-bottom: var(--pf-global--spacer--md);
 }
 
-.co-logs-expression-input__textInput {
+.co-logs-expression-input__searchInput {
+  min-width: 300px;
   margin-right: var(--pf-global--spacer--md);
 }

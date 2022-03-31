@@ -2,10 +2,6 @@
   position: relative;
 }
 
-.co-logs-table-toolbar {
-  width: 100%;
-}
-
 .co-logs-table__time {
   --pf-c-table--cell--WhiteSpace: nowrap;
   font-family: monospace;
