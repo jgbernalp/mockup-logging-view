@@ -1,14 +1,4 @@
-import {
-  Checkbox,
-  Split,
-  SplitItem,
-  Stack,
-  StackItem,
-  Toolbar,
-  ToolbarContent,
-  ToolbarGroup,
-  ToolbarItem,
-} from '@patternfly/react-core';
+import { Checkbox, Split, SplitItem, Toolbar, ToolbarContent, ToolbarGroup, ToolbarItem } from '@patternfly/react-core';
 import { ExpandableRowContent, TableComposable, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import * as _ from 'lodash-es';
 import React from 'react';
@@ -85,7 +75,7 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData, children }) => {
     <>
       <Toolbar isSticky>
         <ToolbarContent>
-          <ToolbarItem style={{ width: '100%' }}>{children}</ToolbarItem>
+          <ToolbarItem className="co-logs-table-toolbar">{children}</ToolbarItem>
 
           <ToolbarGroup>
             <ToolbarItem>

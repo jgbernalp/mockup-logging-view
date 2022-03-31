@@ -1,12 +1,26 @@
 import { LogsExpressionInput } from '@app/components/logs-expression-input';
 import { LogsHistogram } from '@app/components/logs-histogram';
 import { LogsTable } from '@app/components/logs-table';
-import { logsVolumeData, logsStreamData } from '@app/data/logs-test-data';
+import { logsStreamData, logsVolumeData } from '@app/data/logs-test-data';
 import { useBoolean } from '@app/utils/useBoolean';
-import { Dropdown, DropdownItem, DropdownToggle, Flex, PageSection, Title } from '@patternfly/react-core';
+import {
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownToggle,
+  Flex,
+  FormGroup,
+  PageSection,
+  Title,
+  Toolbar,
+  ToolbarContent,
+  ToolbarGroup,
+  ToolbarItem,
+} from '@patternfly/react-core';
+import { SyncAltIcon } from '@patternfly/react-icons';
 import * as React from 'react';
 
-const intervalOptions = [
+const refreshIntervalOptions = [
   { key: 'OFF_KEY', name: 'Refresh off' },
   { key: '15s', name: '15 seconds' },
   { key: '30s', name: '30 seconds' },
@@ -19,7 +33,7 @@ const intervalOptions = [
   { key: '1d', name: '1 day' },
 ];
 
-const PollIntervalDropdown: React.FC = () => {
+const RefreshIntervalDropdown: React.FC = () => {
   const [isOpen, toggleIsOpen, , setClosed] = useBoolean(false);
   const [selectedIndex, setSelectedIndex] = React.useState<number>(0);
 
@@ -29,15 +43,56 @@ const PollIntervalDropdown: React.FC = () => {
   };
 
   return (
-    <Dropdown
-      dropdownItems={intervalOptions.map(({ key, name }, index) => (
-        <DropdownItem componentID={key} onClick={handleSelectedValue(index)} key={key}>
-          {name}
-        </DropdownItem>
-      ))}
-      isOpen={isOpen}
-      toggle={<DropdownToggle onToggle={toggleIsOpen}>{intervalOptions[selectedIndex].name}</DropdownToggle>}
-    />
+    <FormGroup fieldId="logs-refresh-interval">
+      <Dropdown
+        dropdownItems={refreshIntervalOptions.map(({ key, name }, index) => (
+          <DropdownItem componentID={key} onClick={handleSelectedValue(index)} key={key}>
+            {name}
+          </DropdownItem>
+        ))}
+        isOpen={isOpen}
+        toggle={<DropdownToggle onToggle={toggleIsOpen}>{refreshIntervalOptions[selectedIndex].name}</DropdownToggle>}
+      />
+    </FormGroup>
+  );
+};
+
+const timeRangeOptions = [
+  { key: 'CUSTOM', name: 'Custom time range' },
+  { key: '5m', name: 'Last 5 minutes' },
+  { key: '15m', name: 'Last 15 minutes' },
+  { key: '30m', name: 'Last 30 minutes' },
+  { key: '1h', name: 'Last 1 hour' },
+  { key: '2h', name: 'Last 2 hours' },
+  { key: '6h', name: 'Last 6 hours' },
+  { key: '12h', name: 'Last 12 hours' },
+  { key: '1d', name: 'Last 1 day' },
+  { key: '2d', name: 'Last 2 days' },
+  { key: '1w', name: 'Last 1 week' },
+  { key: '2w', name: 'Last 2 weeks' },
+];
+
+const TimeRangeDropdown: React.FC = () => {
+  const [isOpen, toggleIsOpen, , setClosed] = useBoolean(false);
+  const [selectedIndex, setSelectedIndex] = React.useState<number>(1);
+
+  const handleSelectedValue = (index: number) => () => {
+    setClosed();
+    setSelectedIndex(index);
+  };
+
+  return (
+    <FormGroup fieldId="logs-time-range">
+      <Dropdown
+        dropdownItems={timeRangeOptions.map(({ key, name }, index) => (
+          <DropdownItem componentID={key} onClick={handleSelectedValue(index)} key={key}>
+            {name}
+          </DropdownItem>
+        ))}
+        isOpen={isOpen}
+        toggle={<DropdownToggle onToggle={toggleIsOpen}>{timeRangeOptions[selectedIndex].name}</DropdownToggle>}
+      />
+    </FormGroup>
   );
 };
 
@@ -48,9 +103,13 @@ const LogsPage: React.FunctionComponent = () => {
         <Title headingLevel="h1" size="lg">
           Logs
         </Title>
-        <div>
-          <PollIntervalDropdown />
-        </div>
+        <Flex spaceItems={{ default: 'spaceItemsNone' }}>
+          <TimeRangeDropdown />
+          <RefreshIntervalDropdown />
+          <Button variant="primary">
+            <SyncAltIcon />
+          </Button>
+        </Flex>
       </Flex>
       <LogsHistogram logsData={logsVolumeData.data.result} />
 
