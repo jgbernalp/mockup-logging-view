@@ -1,4 +1,4 @@
-type MetricValue = Array<number | string>;
+export type MetricValue = Array<number | string>;
 
 export interface MetricLogData {
   metric: Record<string, string>;

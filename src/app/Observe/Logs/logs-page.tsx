@@ -103,7 +103,7 @@ const LogsPage: React.FunctionComponent = () => {
         <Title headingLevel="h1" size="lg">
           Logs
         </Title>
-        <Flex spaceItems={{ default: 'spaceItemsNone' }}>
+        <Flex>
           <TimeRangeDropdown />
           <RefreshIntervalDropdown />
           <Button variant="primary">

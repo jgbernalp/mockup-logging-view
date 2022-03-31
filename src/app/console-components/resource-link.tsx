@@ -36,6 +36,8 @@ export const ResourceLink: React.FC<ResourceLinkProps> = ({ type, name, link }) 
         return <div style={{ ...iconStyle, backgroundColor: '#009596' }}>P</div>;
       case 'CONTAINER':
         return <div style={{ ...iconStyle, backgroundColor: '#2b9af3' }}>C</div>;
+      case 'NAMESPACE':
+        return <div style={{ ...iconStyle, backgroundColor: '#1e4f18' }}>NS</div>;
     }
     return null;
   };
