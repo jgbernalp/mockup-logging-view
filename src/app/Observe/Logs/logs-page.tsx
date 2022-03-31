@@ -10,6 +10,7 @@ import {
   DropdownToggle,
   Flex,
   FormGroup,
+  Grid,
   PageSection,
   Title,
   Toolbar,
@@ -99,23 +100,25 @@ const TimeRangeDropdown: React.FC = () => {
 const LogsPage: React.FunctionComponent = () => {
   return (
     <PageSection>
-      <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
-        <Title headingLevel="h1" size="lg">
-          Logs
-        </Title>
-        <Flex>
-          <TimeRangeDropdown />
-          <RefreshIntervalDropdown />
-          <Button variant="primary">
-            <SyncAltIcon />
-          </Button>
+      <Grid hasGutter>
+        <Flex justifyContent={{ default: 'justifyContentSpaceBetween' }}>
+          <Title headingLevel="h1" size="lg">
+            Logs
+          </Title>
+          <Flex>
+            <TimeRangeDropdown />
+            <RefreshIntervalDropdown />
+            <Button variant="primary">
+              <SyncAltIcon />
+            </Button>
+          </Flex>
         </Flex>
-      </Flex>
-      <LogsHistogram logsData={logsVolumeData.data.result} />
+        <LogsHistogram logsData={logsVolumeData.data.result} />
 
-      <LogsTable logsData={logsStreamData.data.result}>
-        <LogsExpressionInput />
-      </LogsTable>
+        <LogsTable logsData={logsStreamData.data.result}>
+          <LogsExpressionInput />
+        </LogsTable>
+      </Grid>
     </PageSection>
   );
 };

@@ -1,4 +1,5 @@
 import { Chart, ChartAxis, ChartBar, ChartStack, ChartTooltip, getResizeObserver } from '@patternfly/react-charts';
+import { Card, CardBody } from '@patternfly/react-core';
 import chart_color_blue_100 from '@patternfly/react-tokens/dist/esm/chart_color_blue_100';
 import chart_color_gold_100 from '@patternfly/react-tokens/dist/esm/chart_color_gold_100';
 import chart_color_red_100 from '@patternfly/react-tokens/dist/esm/chart_color_red_100';
@@ -118,26 +119,30 @@ export const LogsHistogram: React.FC<LogHistogramProps> = ({ logsData, ariaDesc 
   }, [aggregatedLogData, width]);
 
   return (
-    <div ref={containerRef} style={{ height: GRAPH_HEIGHT }}>
-      <Chart
-        ariaDesc={ariaDesc}
-        height={GRAPH_HEIGHT}
-        padding={{
-          bottom: 40,
-          left: LEFT_PADDING,
-          right: 0,
-          top: 20,
-        }}
-        width={width}
-      >
-        <ChartAxis tickValues={bars.ticks} fixLabelOverlap />
-        <ChartAxis tickCount={3} dependentAxis showGrid />
-        <ChartStack domainPadding={{ x: [START_DOMAIN_PADDING, END_DOMAIN_PADDING] }}>
-          {bars.infoBars}
-          {bars.warningBars}
-          {bars.errorBars}
-        </ChartStack>
-      </Chart>
-    </div>
+    <Card>
+      <CardBody>
+        <div ref={containerRef} style={{ height: GRAPH_HEIGHT }}>
+          <Chart
+            ariaDesc={ariaDesc}
+            height={GRAPH_HEIGHT}
+            padding={{
+              bottom: 40,
+              left: LEFT_PADDING,
+              right: 0,
+              top: 20,
+            }}
+            width={width}
+          >
+            <ChartAxis tickValues={bars.ticks} fixLabelOverlap />
+            <ChartAxis tickCount={3} dependentAxis showGrid />
+            <ChartStack domainPadding={{ x: [START_DOMAIN_PADDING, END_DOMAIN_PADDING] }}>
+              {bars.infoBars}
+              {bars.warningBars}
+              {bars.errorBars}
+            </ChartStack>
+          </Chart>
+        </div>
+      </CardBody>
+    </Card>
   );
 };

@@ -142,120 +142,123 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData, children }) => {
         onModalToggle={handleModalToggle}
         onColumnsSelected={handleColumnsSelected}
       />
-      <Toolbar isSticky>
-        <ToolbarContent>
-          <ToolbarItem className="co-logs-table-toolbar">{children}</ToolbarItem>
+      <div>
+        <Toolbar isSticky>
+          <ToolbarContent>
+            <ToolbarItem className="co-logs-table-toolbar">{children}</ToolbarItem>
 
-          <ToolbarGroup>
-            <ToolbarItem>
-              <Checkbox
-                label="Show Resources"
-                isChecked={showResources}
-                onChange={setShowResources}
-                aria-label="checkbox for showing resources names"
-                id="showResourcesCheckbox"
-              />
-            </ToolbarItem>
-          </ToolbarGroup>
-          <ToolbarGroup variant="icon-button-group">
-            <ToolbarItem>
-              <Tooltip content="Manage columns">
-                <Button variant="plain" aria-label="edit" onClick={handleModalToggle}>
-                  <ColumnsIcon />
-                </Button>
-              </Tooltip>
-            </ToolbarItem>
-          </ToolbarGroup>
-        </ToolbarContent>
-      </Toolbar>
+            <ToolbarGroup>
+              <ToolbarItem>
+                <Checkbox
+                  label="Show Resources"
+                  isChecked={showResources}
+                  onChange={setShowResources}
+                  aria-label="checkbox for showing resources names"
+                  id="showResourcesCheckbox"
+                />
+              </ToolbarItem>
+            </ToolbarGroup>
+            <ToolbarGroup variant="icon-button-group">
+              <ToolbarItem>
+                <Tooltip content="Manage columns">
+                  <Button variant="plain" aria-label="edit" onClick={handleModalToggle}>
+                    <ColumnsIcon />
+                  </Button>
+                </Tooltip>
+              </ToolbarItem>
+            </ToolbarGroup>
+          </ToolbarContent>
+        </Toolbar>
 
-      <TableComposable aria-label="Logs Table" variant="compact" className="co-logs-table" isStriped isExpandable>
-        <Thead>
-          <Tr>
-            <Th></Th>
-            <Th></Th>
-            <Th>Date</Th>
-            <Th>Message</Th>
-            {visibleColumns.map((column) => (
-              <Th key={column.title}>{column.title}</Th>
-            ))}
-          </Tr>
-        </Thead>
-
-        {tableData.map((value, index) => {
-          const isExpanded = expandedItems.has(rowIndex);
-          const severityClass = getSeverityClass(value.severity);
-
-          const parentRow = (
-            <Tr
-              key={`${value.timestamp}-${rowIndex}`}
-              className={`co-logs-table__row ${severityClass} ${
-                isExpanded ? 'co-logs-table__row-parent-expanded' : ''
-              }`}
-            >
-              <Td expand={{ isExpanded, onToggle: handleRowToggle, rowIndex }} />
-              <Td className="co-logs-table__time">{value.time}</Td>
-              <Td>
-                <div className="co-logs-table__message">{value.message}</div>
-                {showResources && (
-                  <Split className="co-logs-table__resources" hasGutter>
-                    {value.resources.map((resource) => (
-                      <SplitItem key={resource.id}>
-                        <ResourceLink link={resource.link} type={resource.type} name={resource.id} />
-                      </SplitItem>
-                    ))}
-                  </Split>
-                )}
-              </Td>
-              {visibleColumns.map((column, index) => {
-                let columnContent: React.ReactNode = null;
-                switch (column.title) {
-                  case 'Resources':
-                    columnContent = value.resources.map((resource) => (
-                      <ResourceLink key={resource.id} link={resource.link} type={resource.type} name={resource.id} />
-                    ));
-                    break;
-                  case 'Namespace':
-                    {
-                      const namespace = value.namespace;
-                      columnContent = (
-                        <ResourceLink key={namespace.id} link={namespace.link} type="NAMESPACE" name={namespace.id} />
-                      );
-                    }
-                    break;
-                }
-
-                return columnContent ? (
-                  <Td key={`additional-col-${column.title}-row-${index}`}>{columnContent}</Td>
-                ) : null;
-              })}
+        <TableComposable aria-label="Logs Table" variant="compact" className="co-logs-table" isStriped isExpandable>
+          <Thead>
+            <Tr>
+              <Th></Th>
+              <Th></Th>
+              <Th>Date</Th>
+              <Th>Message</Th>
+              {visibleColumns.map((column) => (
+                <Th key={column.title}>{column.title}</Th>
+              ))}
             </Tr>
-          );
+          </Thead>
 
-          const childRow = isExpanded ? (
-            <Tr
-              className={`co-logs-table__row ${severityClass} co-logs-table__row-child-expanded`}
-              isExpanded={true}
-              key={`${value.timestamp}-${rowIndex}-child`}
-            >
-              <Td colSpan={100}>
-                <ExpandableRowContent>
-                  <LogDetail />
-                </ExpandableRowContent>
-              </Td>
-            </Tr>
-          ) : null;
+          {tableData.map((value, index) => {
+            const isExpanded = expandedItems.has(rowIndex);
+            const severityClass = getSeverityClass(value.severity);
 
-          rowIndex += isExpanded ? 2 : 1;
+            const parentRow = (
+              <Tr
+                key={`${value.timestamp}-${rowIndex}`}
+                className={`co-logs-table__row ${severityClass} ${
+                  isExpanded ? 'co-logs-table__row-parent-expanded' : ''
+                }`}
+              >
+                <Td expand={{ isExpanded, onToggle: handleRowToggle, rowIndex }} />
+                <Td className="co-logs-table__time">{value.time}</Td>
+                <Td>
+                  <div className="co-logs-table__message">{value.message}</div>
+                  {showResources && (
+                    <Split className="co-logs-table__resources" hasGutter>
+                      {value.resources.map((resource) => (
+                        <SplitItem key={resource.id}>
+                          <ResourceLink link={resource.link} type={resource.type} name={resource.id} />
+                        </SplitItem>
+                      ))}
+                    </Split>
+                  )}
+                </Td>
+                {visibleColumns.map((column, index) => {
+                  let columnContent: React.ReactNode = null;
+                  switch (column.title) {
+                    case 'Resources':
+                      columnContent = value.resources.map((resource) => (
+                        <ResourceLink key={resource.id} link={resource.link} type={resource.type} name={resource.id} />
+                      ));
+                      break;
+                    case 'Namespace':
+                      {
+                        const namespace = value.namespace;
+                        columnContent = (
+                          <ResourceLink key={namespace.id} link={namespace.link} type="NAMESPACE" name={namespace.id} />
+                        );
+                      }
+                      break;
+                  }
 
-          return (
-            <Tbody isExpanded={isExpanded} key={index}>
-              {parentRow}
-              {childRow}
-            </Tbody>
-          );
-        })}
-      </TableComposable>
+                  return columnContent ? (
+                    <Td key={`additional-col-${column.title}-row-${index}`}>{columnContent}</Td>
+                  ) : null;
+                })}
+              </Tr>
+            );
+
+            const childRow = isExpanded ? (
+              <Tr
+                className={`co-logs-table__row ${severityClass} co-logs-table__row-child-expanded`}
+                isExpanded={true}
+                key={`${value.timestamp}-${rowIndex}-child`}
+              >
+                <Td colSpan={100}>
+                  <ExpandableRowContent>
+                    <LogDetail />
+                  </ExpandableRowContent>
+                </Td>
+              </Tr>
+            ) : null;
+
+            // Expanded elements add a row in the table
+            rowIndex += isExpanded ? 2 : 1;
+
+            return (
+              <Tbody isExpanded={isExpanded} key={index}>
+                {parentRow}
+                {childRow}
+              </Tbody>
+            );
+          })}
+        </TableComposable>
+      </div>
     </>
   );
 };
