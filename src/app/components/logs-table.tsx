@@ -2,10 +2,17 @@ import { ColumnManagementModal } from '@app/console-components/column-management
 import {
   Button,
   Checkbox,
+  Select,
+  SelectOption,
+  SelectOptionObject,
+  SelectVariant,
   Split,
   SplitItem,
   Toolbar,
+  ToolbarChip,
+  ToolbarChipGroup,
   ToolbarContent,
+  ToolbarFilter,
   ToolbarGroup,
   ToolbarItem,
   Tooltip,
@@ -200,8 +207,11 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData, children }) => {
   const [expandedItems, setExpandedItems] = React.useState<Set<number>>(new Set());
   const [showResources, setShowResources] = React.useState(false);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [isSeverityExpanded, setIsSeverityExpanded] = React.useState(false);
+  const [severityFilter, setSeverityFilter] = React.useState<Set<string>>(new Set());
   const [sortBy, setSortBy] = React.useState<ISortBy>({ index: 0, direction: 'desc' });
   const [additionalColumns, setAdditionalColumns] = React.useState(defaultAdditionalColumns);
+
   const tableData = React.useMemo(() => aggregateStreamLogData(logsData), [logsData]);
 
   const handleRowToggle = (_event: React.MouseEvent, rowIndex: number) => {
@@ -248,6 +258,28 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData, children }) => {
     return tableData;
   }, [tableData, visibleColumns, sortBy]);
 
+  const onDeleteSeverityFilter = (_category: string | ToolbarChipGroup, chip: string | ToolbarChip) => {
+    severityFilter.delete(chip.toString());
+    setSeverityFilter(new Set(severityFilter));
+  };
+
+  const onDeleteSeverityGroup = () => {
+    setSeverityFilter(new Set());
+  };
+
+  const onSeverityToggle = () => {
+    setIsSeverityExpanded(!isSeverityExpanded);
+  };
+
+  const onSeveritySelect = (_: React.MouseEvent | React.ChangeEvent, value: string | SelectOptionObject) => {
+    if (severityFilter.has(value.toString())) {
+      severityFilter.delete(value.toString());
+      setSeverityFilter(new Set(severityFilter));
+    } else {
+      setSeverityFilter(new Set(severityFilter.add(value.toString())));
+    }
+  };
+
   let rowIndex = 0;
 
   return (
@@ -260,11 +292,39 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData, children }) => {
         onColumnsSelected={handleColumnsSelected}
       />
       <div>
-        <Toolbar isSticky>
+        <Toolbar isSticky clearAllFilters={onDeleteSeverityGroup}>
           <ToolbarContent>
             <ToolbarGroup>
               <ToolbarItem>{children}</ToolbarItem>
             </ToolbarGroup>
+
+            <ToolbarGroup variant="filter-group">
+              <ToolbarFilter
+                chips={Array.from(severityFilter)}
+                deleteChip={onDeleteSeverityFilter}
+                deleteChipGroup={onDeleteSeverityGroup}
+                categoryName="Severity"
+              >
+                <Select
+                  variant={SelectVariant.checkbox}
+                  aria-label="Severity"
+                  onToggle={onSeverityToggle}
+                  onSelect={onSeveritySelect}
+                  selections={Array.from(severityFilter)}
+                  isOpen={isSeverityExpanded}
+                  placeholderText="Severity"
+                >
+                  {[
+                    <SelectOption key="error" value="Error" />,
+                    <SelectOption key="warning" value="Warning" />,
+                    <SelectOption key="debug" value="Debug" />,
+                    <SelectOption key="info" value="Info" />,
+                    <SelectOption key="other" value="Other" />,
+                  ]}
+                </Select>
+              </ToolbarFilter>
+            </ToolbarGroup>
+
             <ToolbarGroup variant="icon-button-group">
               <ToolbarItem>
                 <Tooltip content="Manage columns">
