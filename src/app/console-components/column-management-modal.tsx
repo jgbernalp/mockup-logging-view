@@ -65,7 +65,7 @@ export const ColumnManagementModal: React.FC<ColumnManagementModalProps> = ({
               <DataListCheck
                 aria-labelledby={`column-${column.title}`}
                 isDisabled={!!column.isDisabled}
-                isChecked={!!column.isSelected}
+                checked={!!column.isSelected}
                 onChange={handleColumnToggle(column.title)}
               />
               <DataListItemCells

@@ -11,28 +11,57 @@ import {
   Tooltip,
 } from '@patternfly/react-core';
 import { ColumnsIcon } from '@patternfly/react-icons';
-import { ExpandableRowContent, TableComposable, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
+import {
+  ExpandableRowContent,
+  ISortBy,
+  TableComposable,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  ThProps,
+  Tr,
+} from '@patternfly/react-table';
 import * as _ from 'lodash-es';
 import React from 'react';
-import { ResourceLink } from '../console-components/resource-link';
 import { DateFormat, dateToFormat } from '../console-components/date-utils';
+import { ResourceLink } from '../console-components/resource-link';
 import { LogDetail } from './log-detail';
 import './logs-table.css';
 import { MetricValue, StreamLogData } from './logs.types';
 
-interface LogsTableProps {
+type LogsTableProps = {
   logsData: Array<StreamLogData>;
-}
+};
+
+type Resource = {
+  type: string;
+  id: string;
+  link: string;
+};
+
+type TableCellValue = string | number | Resource | Array<Resource>;
 
 type LogsTableColumn = {
   title: string;
   isDisabled?: boolean;
   isSelected?: boolean;
+  sort?: <T extends TableCellValue>(a: T, b: T, directionMultiplier: number) => number;
+  value: (row: LogData) => TableCellValue;
 };
 
-const parseValueData = (value: MetricValue, index: number) => {
-  const timestamp = String(value[0]);
-  const time = parseFloat(timestamp) / 1e6;
+type LogData = {
+  time: string;
+  timestamp: number;
+  severity: string;
+  namespace: Resource;
+  resources: Array<Resource>;
+  message: string;
+};
+
+const parseValueData = (value: MetricValue, index: number): LogData => {
+  const timestamp = parseFloat(String(value[0]));
+  const time = timestamp / 1e6;
   const formattedTime = dateToFormat(time, DateFormat.Full);
 
   return {
@@ -48,24 +77,29 @@ const parseValueData = (value: MetricValue, index: number) => {
     resources: [
       {
         type: 'POD',
-        id: 'cluster-6b8b8f66c7-k4v9q',
+        id: [
+          'cluster-6b8b8f66c7-k4v9q',
+          'other-f66c6b8b87-9qk4v',
+          'a_other-f66c6b8b87-9qk4v',
+          'b_other-f66c6b8b87-9qk4v',
+          'z_other-f66c6b8b87-9qk4v',
+        ][index % 5],
         // TODO: resource link builder
         link: '/k8s/ns/openshift-gitops/pods/cluster-6b8b8f66c7-k4v9q',
       },
       {
         type: 'CONTAINER',
-        id: 'cluster',
+        id: ['cluster', 'other', 'a_other', 'b_other', 'z_other'][index % 5],
         // TODO: resource link builder
         link: 'k8s/ns/openshift-gitops/pods/cluster-6b8b8f66c7-k4v9q/containers/cluster',
       },
     ],
-    message: value[1],
+    message: String(value[1]),
   };
 };
 
 const aggregateStreamLogData = (data: Array<StreamLogData>) => {
   // TODO merge based on timestamp
-  // TODO color code different streams
   const aggregatedValues = data.length === 1 ? data[0].values : _.flatMap(data.map((stream) => stream.values));
 
   return aggregatedValues.slice(0, 100).map(parseValueData);
@@ -75,16 +109,20 @@ const getSeverityClass = (severity: string) => {
   return severity ? `co-logs-table__severity-${severity}` : '';
 };
 
-const defaultColumns: Array<LogsTableColumn> = [
+const fixedColumns: Array<LogsTableColumn> = [
   {
     title: 'Date',
     isDisabled: true,
     isSelected: true,
+    value: (row: LogData) => row.timestamp,
+    // sort with an appropriate numeric comparator for big floats
+    sort: (a, b, directionMultiplier) => (a < b ? -1 : a > b ? 1 : 0) * directionMultiplier,
   },
   {
     title: 'Message',
     isDisabled: true,
     isSelected: true,
+    value: (row: LogData) => row.message,
   },
 ];
 
@@ -93,18 +131,76 @@ const defaultAdditionalColumns: Array<LogsTableColumn> = [
     title: 'Resources',
     isDisabled: false,
     isSelected: false,
+    value: (row: LogData) => row.resources.map((resource) => resource.id).join('_'),
+    sort: (a, b, directionMultiplier) => a.toString().localeCompare(b.toString()) * directionMultiplier,
   },
   {
     title: 'Namespace',
     isDisabled: false,
     isSelected: false,
+    value: (row: LogData) => row.namespace.id,
+    sort: (a, b, directionMultiplier) => a.toString().localeCompare(b.toString()) * directionMultiplier,
   },
 ];
+
+const getRowClassName = (index: number): string => {
+  switch (index) {
+    case 0:
+      return 'co-logs-table__time';
+    case 1:
+      return 'co-logs-table__message';
+  }
+
+  return '';
+};
+
+type LogRowProps = {
+  data: LogData;
+  title: string;
+  showResources: boolean;
+};
+
+const LogRow: React.FC<LogRowProps> = ({ data, title, showResources }) => {
+  switch (title) {
+    case 'Date':
+      return <>{data.time}</>;
+    case 'Message':
+      return (
+        <>
+          <div className="co-logs-table__message">{data.message}</div>
+          {showResources && (
+            <Split className="co-logs-table__resources" hasGutter>
+              {data.resources.map((resource) => (
+                <SplitItem key={resource.id}>
+                  <ResourceLink link={resource.link} type={resource.type} name={resource.id} />
+                </SplitItem>
+              ))}
+            </Split>
+          )}
+        </>
+      );
+    case 'Resources':
+      return (
+        <>
+          {data.resources.map((resource) => (
+            <ResourceLink key={resource.id} link={resource.link} type={resource.type} name={resource.id} />
+          ))}
+        </>
+      );
+    case 'Namespace': {
+      const namespace = data.namespace;
+      return <ResourceLink key={namespace.id} link={namespace.link} type="NAMESPACE" name={namespace.id} />;
+    }
+  }
+
+  return null;
+};
 
 export const LogsTable: React.FC<LogsTableProps> = ({ logsData, children }) => {
   const [expandedItems, setExpandedItems] = React.useState<Set<number>>(new Set());
   const [showResources, setShowResources] = React.useState(false);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [sortBy, setSortBy] = React.useState<ISortBy>({ index: 0, direction: 'desc' });
   const [additionalColumns, setAdditionalColumns] = React.useState(defaultAdditionalColumns);
   const tableData = React.useMemo(() => aggregateStreamLogData(logsData), [logsData]);
 
@@ -123,13 +219,34 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData, children }) => {
 
   const handleColumnsSelected = (columns: Array<LogsTableColumn>) => {
     setIsModalOpen(false);
+    setSortBy({ index: 0, direction: 'desc' });
     setAdditionalColumns(columns);
   };
 
   const visibleColumns = React.useMemo(
-    () => additionalColumns.filter((column) => column.isSelected),
+    () => fixedColumns.concat(additionalColumns.filter((column) => column.isSelected)),
     [additionalColumns]
   );
+
+  const getSortParams = (columnIndex: number): ThProps['sort'] => ({
+    sortBy,
+    onSort: (_event, index, direction) => {
+      setExpandedItems(new Set());
+      setSortBy({ index, direction, defaultDirection: 'desc' });
+    },
+    columnIndex,
+  });
+
+  const sortedData = React.useMemo(() => {
+    if (sortBy.index !== undefined && visibleColumns[sortBy.index]) {
+      const { sort, value } = visibleColumns[sortBy.index];
+      if (sort) {
+        return tableData.sort((a, b) => sort(value(a), value(b), sortBy.direction === 'asc' ? 1 : -1));
+      }
+    }
+
+    return tableData;
+  }, [tableData, visibleColumns, sortBy]);
 
   let rowIndex = 0;
 
@@ -137,7 +254,7 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData, children }) => {
     <>
       {/* TODO: use ColumnManagementModal from console project */}
       <ColumnManagementModal
-        columns={defaultColumns.concat(additionalColumns)}
+        columns={fixedColumns.concat(additionalColumns)}
         isModalOpen={isModalOpen}
         onModalToggle={handleModalToggle}
         onColumnsSelected={handleColumnsSelected}
@@ -174,15 +291,15 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData, children }) => {
             <Tr>
               <Th></Th>
               <Th></Th>
-              <Th>Date</Th>
-              <Th>Message</Th>
-              {visibleColumns.map((column) => (
-                <Th key={column.title}>{column.title}</Th>
+              {visibleColumns.map((column, index) => (
+                <Th sort={column.sort ? getSortParams(index) : undefined} key={column.title}>
+                  {column.title}
+                </Th>
               ))}
             </Tr>
           </Thead>
 
-          {tableData.map((value, index) => {
+          {sortedData.map((value, index) => {
             const isExpanded = expandedItems.has(rowIndex);
             const severityClass = getSeverityClass(value.severity);
 
@@ -194,39 +311,14 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData, children }) => {
                 }`}
               >
                 <Td expand={{ isExpanded, onToggle: handleRowToggle, rowIndex }} />
-                <Td className="co-logs-table__time">{value.time}</Td>
-                <Td>
-                  <div className="co-logs-table__message">{value.message}</div>
-                  {showResources && (
-                    <Split className="co-logs-table__resources" hasGutter>
-                      {value.resources.map((resource) => (
-                        <SplitItem key={resource.id}>
-                          <ResourceLink link={resource.link} type={resource.type} name={resource.id} />
-                        </SplitItem>
-                      ))}
-                    </Split>
-                  )}
-                </Td>
-                {visibleColumns.map((column, index) => {
-                  let columnContent: React.ReactNode = null;
-                  switch (column.title) {
-                    case 'Resources':
-                      columnContent = value.resources.map((resource) => (
-                        <ResourceLink key={resource.id} link={resource.link} type={resource.type} name={resource.id} />
-                      ));
-                      break;
-                    case 'Namespace':
-                      {
-                        const namespace = value.namespace;
-                        columnContent = (
-                          <ResourceLink key={namespace.id} link={namespace.link} type="NAMESPACE" name={namespace.id} />
-                        );
-                      }
-                      break;
-                  }
 
-                  return columnContent ? (
-                    <Td key={`additional-col-${column.title}-row-${index}`}>{columnContent}</Td>
+                {visibleColumns.map((column, index) => {
+                  const content = <LogRow data={value} title={column.title} showResources={showResources} />;
+
+                  return content ? (
+                    <Td key={`col-${column.title}-row-${index}`} className={getRowClassName(index)}>
+                      {content}
+                    </Td>
                   ) : null;
                 })}
               </Tr>
@@ -246,7 +338,7 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData, children }) => {
               </Tr>
             ) : null;
 
-            // Expanded elements add a row in the table
+            // Expanded elements create an additional row in the table
             rowIndex += isExpanded ? 2 : 1;
 
             return (
