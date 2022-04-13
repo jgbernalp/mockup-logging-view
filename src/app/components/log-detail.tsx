@@ -17,7 +17,7 @@ export const LogDetail: React.FC = () => (
     <DescriptionListGroup>
       <DescriptionListTerm>Namespace</DescriptionListTerm>
       <DescriptionListDescription>
-        <a href="#">mary-test</a>
+        <a href="#">openshift-monitoring</a>
       </DescriptionListDescription>
     </DescriptionListGroup>
     <DescriptionListGroup>

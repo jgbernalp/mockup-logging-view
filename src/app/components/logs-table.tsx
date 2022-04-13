@@ -1,4 +1,5 @@
 import { ColumnManagementModal } from '@app/console-components/column-management-modal';
+import { TogglePlayWithTranslation } from '@app/console-components/toggle-play-with-translation';
 import {
   Button,
   Checkbox,
@@ -39,6 +40,8 @@ import { MetricValue, StreamLogData } from './logs.types';
 
 type LogsTableProps = {
   logsData: Array<StreamLogData>;
+  isStreaming?: boolean;
+  onToggleStreaming?: (e: React.MouseEvent) => void;
 };
 
 type Resource = {
@@ -79,26 +82,26 @@ const parseValueData = (value: MetricValue, index: number): LogData => {
       type: 'POD',
       id: ['default', 'openshift-console', 'openshift-monitoring', ''][index % 3],
       // TODO: resource link builder
-      link: '/k8s/ns/openshift-gitops/pods/cluster-6b8b8f66c7-k4v9q',
+      link: '/k8s/ns/openshift-gitops/pods/cluster-autoscaler-6b8b8f66c7-k4v9q',
     },
     resources: [
       {
         type: 'POD',
         id: [
-          'cluster-6b8b8f66c7-k4v9q',
+          'cluster-autoscaler-6b8b8f66c7-k4v9q',
           'other-f66c6b8b87-9qk4v',
           'a_other-f66c6b8b87-9qk4v',
           'b_other-f66c6b8b87-9qk4v',
           'z_other-f66c6b8b87-9qk4v',
         ][index % 5],
         // TODO: resource link builder
-        link: '/k8s/ns/openshift-gitops/pods/cluster-6b8b8f66c7-k4v9q',
+        link: '/k8s/ns/openshift-gitops/pods/cluster-autoscaler-6b8b8f66c7-k4v9q',
       },
       {
         type: 'CONTAINER',
-        id: ['cluster', 'other', 'a_other', 'b_other', 'z_other'][index % 5],
+        id: ['cluster-autoscaler', 'other', 'a_other', 'b_other', 'z_other'][index % 5],
         // TODO: resource link builder
-        link: 'k8s/ns/openshift-gitops/pods/cluster-6b8b8f66c7-k4v9q/containers/cluster',
+        link: 'k8s/ns/openshift-gitops/pods/cluster-autoscaler-6b8b8f66c7-k4v9q/containers/cluster-autoscaler',
       },
     ],
     message: String(value[1]),
@@ -203,7 +206,7 @@ const LogRow: React.FC<LogRowProps> = ({ data, title, showResources }) => {
   return null;
 };
 
-export const LogsTable: React.FC<LogsTableProps> = ({ logsData, children }) => {
+export const LogsTable: React.FC<LogsTableProps> = ({ logsData, isStreaming, onToggleStreaming, children }) => {
   const [expandedItems, setExpandedItems] = React.useState<Set<number>>(new Set());
   const [showResources, setShowResources] = React.useState(false);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
@@ -294,7 +297,7 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData, children }) => {
       <div>
         <Toolbar isSticky clearAllFilters={onDeleteSeverityGroup}>
           <ToolbarContent>
-            <ToolbarGroup>
+            <ToolbarGroup alignment={{ default: 'alignLeft' }}>
               <ToolbarItem>{children}</ToolbarItem>
             </ToolbarGroup>
 
@@ -343,6 +346,10 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData, children }) => {
                 />
               </ToolbarItem>
             </ToolbarGroup>
+
+            <ToolbarGroup alignment={{ default: 'alignRight' }}>
+              <TogglePlayWithTranslation active={isStreaming} onClick={onToggleStreaming} />
+            </ToolbarGroup>
           </ToolbarContent>
         </Toolbar>
 
@@ -358,6 +365,20 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData, children }) => {
               ))}
             </Tr>
           </Thead>
+
+          {isStreaming && (
+            <Tbody>
+              <Tr>
+                <Td
+                  colSpan={visibleColumns.length + 2}
+                  key="col-streaming-row"
+                  className="co-logs-table__row-streaming"
+                >
+                  Streaming Logs...
+                </Td>
+              </Tr>
+            </Tbody>
+          )}
 
           {sortedData.map((value, index) => {
             const isExpanded = expandedItems.has(rowIndex);
@@ -390,7 +411,7 @@ export const LogsTable: React.FC<LogsTableProps> = ({ logsData, children }) => {
                 isExpanded={true}
                 key={`${value.timestamp}-${rowIndex}-child`}
               >
-                <Td colSpan={100}>
+                <Td colSpan={visibleColumns.length + 2}>
                   <ExpandableRowContent>
                     <LogDetail />
                   </ExpandableRowContent>

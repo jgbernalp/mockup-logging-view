@@ -8,6 +8,7 @@ import { LogsPage } from '@app/Observe/Logs/logs-page';
 import { NotFound } from '@app/NotFound/NotFound';
 import { useDocumentTitle } from '@app/utils/useDocumentTitle';
 import { LastLocationProvider, useLastLocation } from 'react-router-last-location';
+import { PodDetail } from './Pods/pod-detail';
 
 let routeFocusTimer: number;
 export interface IAppRoute {
@@ -36,6 +37,13 @@ const routes: AppRouteConfig[] = [
     label: 'Dashboard',
     path: '/',
     title: 'PatternFly Seed | Main Dashboard',
+  },
+  {
+    component: PodDetail,
+    exact: true,
+    label: 'Pods',
+    path: '/pods',
+    title: 'Pods',
   },
   {
     label: 'Observe',

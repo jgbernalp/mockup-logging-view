@@ -55,3 +55,12 @@
 .co-logs-table tr > :first-child::after {
   --pf-c-table__expandable-row--after--BorderLeftWidth: none;
 }
+
+.co-logs-table__row-streaming{
+  text-align: center;
+  font-size: var(--pf-global--FontSize--xs);
+  --pf-c-table--cell--Color: white;
+  background-color: var(--pf-global--info-color--100);
+  --pf-c-table--cell--PaddingBottom: var(--pf-global--spacer--xs);
+  --pf-c-table--cell--PaddingTop: var(--pf-global--spacer--xs);
+}

@@ -17,6 +17,7 @@ import {
   ToolbarContent,
   ToolbarGroup,
   ToolbarItem,
+  Tooltip,
 } from '@patternfly/react-core';
 import { SyncAltIcon } from '@patternfly/react-icons';
 import * as React from 'react';
@@ -97,7 +98,39 @@ const TimeRangeDropdown: React.FC = () => {
   );
 };
 
+let interval: NodeJS.Timeout | null = null;
+
 const LogsPage: React.FunctionComponent = () => {
+  const [isStreaming, setIsStreaming] = React.useState(false);
+  const [logsData, setLogsData] = React.useState(logsStreamData.data.result);
+
+  const handleToggleStreaming = () => {
+    setIsStreaming(!isStreaming);
+  };
+
+  // TODO: remove as is only for testing streaming UI
+  React.useEffect(() => {
+    if (isStreaming) {
+      if (interval) {
+        clearInterval(interval);
+      }
+      interval = setInterval(() => {
+        setLogsData((prev) => [
+          {
+            stream: prev[0].stream,
+            values: [prev[0].values[0], ...prev[0].values],
+          },
+        ]);
+      }, 700);
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [isStreaming]);
+
   return (
     <PageSection>
       <Grid hasGutter>
@@ -108,14 +141,16 @@ const LogsPage: React.FunctionComponent = () => {
           <Flex>
             <TimeRangeDropdown />
             <RefreshIntervalDropdown />
-            <Button aria-label="Refresh" variant="primary">
-              <SyncAltIcon />
-            </Button>
+            <Tooltip content={<div>Refresh</div>}>
+              <Button aria-label="Refresh" variant="primary">
+                <SyncAltIcon />
+              </Button>
+            </Tooltip>
           </Flex>
         </Flex>
         <LogsHistogram logsData={logsVolumeData.data.result} />
 
-        <LogsTable logsData={logsStreamData.data.result}>
+        <LogsTable logsData={logsData} isStreaming={isStreaming} onToggleStreaming={handleToggleStreaming}>
           <LogsExpressionInput />
         </LogsTable>
       </Grid>

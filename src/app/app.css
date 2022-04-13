@@ -9,3 +9,7 @@ body,
   --pf-c-content--blockquote--BorderLeftColor: purple; /* changes all <blockquote> left border color to purple */
   --pf-c-content--hr--BackgroundColor: lemonchiffon; /* changes a <hr> color to lemonchiffon */
 }
+
+.pf-c-page__main-section{
+  background-color: white;
+}

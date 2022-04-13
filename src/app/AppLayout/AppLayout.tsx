@@ -1,17 +1,16 @@
-import * as React from 'react';
-import { NavLink, useLocation, useHistory } from 'react-router-dom';
+import { IAppRoute, IAppRouteGroup, routes } from '@app/routes';
 import {
   Nav,
-  NavList,
-  NavItem,
   NavExpandable,
+  NavItem,
+  NavList,
   Page,
   PageHeader,
   PageSidebar,
   SkipToContent,
 } from '@patternfly/react-core';
-import { routes, IAppRoute, IAppRouteGroup } from '@app/routes';
-import logo from '@app/bgimages/Patternfly-Logo.svg';
+import * as React from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 
 interface IAppLayout {
   children: React.ReactNode;
@@ -31,21 +30,8 @@ const AppLayout: React.FunctionComponent<IAppLayout> = ({ children }) => {
     setIsMobileView(props.mobileView);
   };
 
-  function LogoImg() {
-    const history = useHistory();
-    function handleClick() {
-      history.push('/');
-    }
-    return <img src={logo} onClick={handleClick} alt="PatternFly Logo" />;
-  }
-
   const Header = (
-    <PageHeader
-      logo={<LogoImg />}
-      showNavToggle
-      isNavOpen={isNavOpen}
-      onNavToggle={isMobileView ? onNavToggleMobile : onNavToggle}
-    />
+    <PageHeader showNavToggle isNavOpen={isNavOpen} onNavToggle={isMobileView ? onNavToggleMobile : onNavToggle} />
   );
 
   const location = useLocation();
